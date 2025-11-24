@@ -4,11 +4,11 @@ import { StatCard } from '@/components/dashboard/StatCard';
 import { Button } from '@/components/ui/button';
 import { Calendar, CheckCircle, Bell, MessageCircle, Plus, Bot } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
-import { schedulesApi, remindersApi } from '@/lib/api';
+import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
 
 const Dashboard = () => {
-  const { user } = useAuth();
+  const { user, profile } = useAuth();
   const navigate = useNavigate();
   const [stats, setStats] = useState({
     total: 0,
@@ -28,11 +28,11 @@ const Dashboard = () => {
 
     try {
       const [schedulesRes, remindersRes] = await Promise.all([
-        schedulesApi.getByUserId(user.id),
-        remindersApi.getByUserId(user.id),
+        supabase.from('schedules').select('*').eq('user_id', user.id),
+        supabase.from('reminders').select('*').eq('user_id', user.id),
       ]);
 
-      const schedules = schedulesRes.data;
+      const schedules = schedulesRes.data || [];
       const today = new Date().toISOString().split('T')[0];
       const todaySchedules = schedules.filter((s: any) => s.date === today);
 
@@ -40,7 +40,7 @@ const Dashboard = () => {
         total: schedules.length,
         todayCompleted: todaySchedules.filter((s: any) => s.status === 'completed').length,
         todayTotal: todaySchedules.length,
-        activeReminders: remindersRes.data.filter((r: any) => r.isActive).length,
+        activeReminders: (remindersRes.data || []).filter((r: any) => r.is_active).length,
         chats: 0,
       });
 
@@ -55,7 +55,7 @@ const Dashboard = () => {
       <div className="space-y-8">
         <div className="bg-gradient-hero rounded-3xl p-8 text-white">
           <h1 className="text-3xl font-bold mb-2">
-            Python Devops Welcome back {user?.fullName || 'Brayen'}! 👋
+            Welcome back {profile?.full_name || 'User'}! 👋
           </h1>
           <p className="text-white/90 mb-6">
             AI Planner siap membantu Anda mengatur jadwal dan meningkatkan produktivitas hari ini.
@@ -111,7 +111,7 @@ const Dashboard = () => {
             <div>
               <h2 className="text-2xl font-bold">Kegiatan Hari Ini</h2>
               <p className="text-muted-foreground">
-                Senin, {new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}
+                {new Date().toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
               </p>
             </div>
             <Button variant="link" className="text-primary" onClick={() => navigate('/jadwal')}>
@@ -126,7 +126,7 @@ const Dashboard = () => {
                   key={schedule.id}
                   className="flex items-center gap-4 p-4 bg-muted/50 rounded-xl"
                 >
-                  <div className="text-lg font-bold w-20">{schedule.startTime}</div>
+                  <div className="text-lg font-bold w-20">{schedule.start_time}</div>
                   <div className="flex-1">
                     <h3 className="font-semibold">{schedule.title}</h3>
                     {schedule.status === 'ongoing' && (

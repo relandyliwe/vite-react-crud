@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Plus, Search, Calendar, Clock, Zap, CheckCircle } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
-import { schedulesApi } from '@/lib/api';
+import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import {
   Dialog,
@@ -34,8 +34,8 @@ const Jadwal = () => {
   const [formData, setFormData] = useState({
     title: '',
     date: '',
-    startTime: '',
-    endTime: '',
+    start_time: '',
+    end_time: '',
     location: '',
     priority: 'medium',
     status: 'pending',
@@ -52,8 +52,14 @@ const Jadwal = () => {
   const loadSchedules = async () => {
     if (!user) return;
     try {
-      const response = await schedulesApi.getByUserId(user.id);
-      setSchedules(response.data);
+      const { data, error } = await supabase
+        .from('schedules')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('date', { ascending: false });
+
+      if (error) throw error;
+      setSchedules(data || []);
     } catch (error) {
       console.error('Error loading schedules:', error);
     }
@@ -82,16 +88,24 @@ const Jadwal = () => {
     try {
       const scheduleData = {
         ...formData,
-        userId: user?.id,
+        user_id: user?.id,
         description: '',
-        createdAt: new Date().toISOString(),
       };
 
       if (editingSchedule) {
-        await schedulesApi.update(editingSchedule.id, scheduleData);
+        const { error } = await supabase
+          .from('schedules')
+          .update(scheduleData)
+          .eq('id', editingSchedule.id);
+
+        if (error) throw error;
         toast.success('Jadwal berhasil diperbarui');
       } else {
-        await schedulesApi.create(scheduleData);
+        const { error } = await supabase
+          .from('schedules')
+          .insert([scheduleData]);
+
+        if (error) throw error;
         toast.success('Jadwal berhasil ditambahkan');
       }
 
@@ -99,13 +113,19 @@ const Jadwal = () => {
       setIsDialogOpen(false);
       resetForm();
     } catch (error) {
+      console.error('Error:', error);
       toast.error('Gagal menyimpan jadwal');
     }
   };
 
-  const handleDelete = async (id: number) => {
+  const handleDelete = async (id: string) => {
     try {
-      await schedulesApi.delete(id);
+      const { error } = await supabase
+        .from('schedules')
+        .delete()
+        .eq('id', id);
+
+      if (error) throw error;
       toast.success('Jadwal berhasil dihapus');
       loadSchedules();
     } catch (error) {
@@ -115,7 +135,12 @@ const Jadwal = () => {
 
   const handleStatusChange = async (schedule: any, newStatus: string) => {
     try {
-      await schedulesApi.update(schedule.id, { ...schedule, status: newStatus });
+      const { error } = await supabase
+        .from('schedules')
+        .update({ status: newStatus })
+        .eq('id', schedule.id);
+
+      if (error) throw error;
       toast.success('Status berhasil diperbarui');
       loadSchedules();
     } catch (error) {
@@ -127,8 +152,8 @@ const Jadwal = () => {
     setFormData({
       title: '',
       date: '',
-      startTime: '',
-      endTime: '',
+      start_time: '',
+      end_time: '',
       location: '',
       priority: 'medium',
       status: 'pending',
@@ -141,8 +166,8 @@ const Jadwal = () => {
     setFormData({
       title: schedule.title,
       date: schedule.date,
-      startTime: schedule.startTime,
-      endTime: schedule.endTime,
+      start_time: schedule.start_time,
+      end_time: schedule.end_time,
       location: schedule.location,
       priority: schedule.priority,
       status: schedule.status,
@@ -216,8 +241,8 @@ const Jadwal = () => {
                     <Label>Waktu Mulai</Label>
                     <Input
                       type="time"
-                      value={formData.startTime}
-                      onChange={(e) => setFormData({ ...formData, startTime: e.target.value })}
+                      value={formData.start_time}
+                      onChange={(e) => setFormData({ ...formData, start_time: e.target.value })}
                       required
                     />
                   </div>
@@ -225,8 +250,8 @@ const Jadwal = () => {
                     <Label>Waktu Selesai</Label>
                     <Input
                       type="time"
-                      value={formData.endTime}
-                      onChange={(e) => setFormData({ ...formData, endTime: e.target.value })}
+                      value={formData.end_time}
+                      onChange={(e) => setFormData({ ...formData, end_time: e.target.value })}
                       required
                     />
                   </div>
@@ -340,6 +365,8 @@ const Jadwal = () => {
             <ScheduleCard
               key={schedule.id}
               {...schedule}
+              startTime={schedule.start_time}
+              endTime={schedule.end_time}
               onEdit={() => openEditDialog(schedule)}
               onDelete={() => handleDelete(schedule.id)}
               onStatusChange={(status) => handleStatusChange(schedule, status)}
