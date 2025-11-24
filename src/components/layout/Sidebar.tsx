@@ -4,7 +4,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 
 export const Sidebar = () => {
-  const { user, logout } = useAuth();
+  const { profile, logout } = useAuth();
 
   const navItems = [
     { to: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
@@ -46,12 +46,12 @@ export const Sidebar = () => {
       <div className="p-4 border-t border-white/10">
         <div className="flex items-center gap-3 mb-4">
           <div className="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-white font-bold">
-            {user?.fullName?.charAt(0) || 'B'}
+            {profile?.full_name?.charAt(0) || 'U'}
           </div>
           <div>
-            <p className="font-semibold text-white">{user?.fullName || 'Brayen'}</p>
+            <p className="font-semibold text-white">{profile?.full_name || 'User'}</p>
             <p className="text-xs text-sidebar-fg/70">
-              {user?.isPremium ? 'Premium User' : 'Free User'}
+              {profile?.is_premium ? 'Premium User' : 'Free User'}
             </p>
           </div>
         </div>

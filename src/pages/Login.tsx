@@ -9,8 +9,8 @@ import { toast } from 'sonner';
 const Login = () => {
   const navigate = useNavigate();
   const { login } = useAuth();
-  const [username, setUsername] = useState('brayen');
-  const [password, setPassword] = useState('password123');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -18,12 +18,12 @@ const Login = () => {
     setIsLoading(true);
 
     try {
-      const success = await login(username, password);
+      const success = await login(email, password);
       if (success) {
         toast.success('Login berhasil!');
         navigate('/dashboard');
       } else {
-        toast.error('Username atau password salah');
+        toast.error('Email atau password salah');
       }
     } catch (error) {
       toast.error('Terjadi kesalahan saat login');
@@ -51,15 +51,15 @@ const Login = () => {
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="block text-sm font-medium mb-2">Username</label>
+              <label className="block text-sm font-medium mb-2">Email</label>
               <div className="relative">
                 <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
                 <Input
-                  type="text"
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
                   className="pl-10 bg-muted/50 border-none"
-                  placeholder="brayen"
+                  placeholder="email@example.com"
                   required
                 />
               </div>

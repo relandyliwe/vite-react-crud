@@ -17,27 +17,27 @@ import {
 } from '@/components/ui/select';
 
 const Profil = () => {
-  const { user, updateUser } = useAuth();
+  const { profile, updateProfile } = useAuth();
   const [formData, setFormData] = useState({
-    fullName: user?.fullName || '',
-    email: user?.email || '',
-    phone: user?.phone || '',
-    gender: user?.gender || '',
-    birthDate: user?.birthDate || '',
+    full_name: profile?.full_name || '',
+    email: profile?.email || '',
+    phone: profile?.phone || '',
+    gender: profile?.gender || '',
+    birth_date: profile?.birth_date || '',
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await updateUser(formData);
+      await updateProfile(formData);
       toast.success('Profil berhasil diperbarui');
     } catch (error) {
       toast.error('Gagal memperbarui profil');
     }
   };
 
-  const scheduleCount = 3;
-  const memberSince = user?.joinedDate ? new Date(user.joinedDate).toLocaleDateString('id-ID', { month: 'long', year: 'numeric' }) : 'November 2025';
+  const scheduleCount = 0;
+  const memberSince = profile?.joined_date ? new Date(profile.joined_date).toLocaleDateString('id-ID', { month: 'long', year: 'numeric' }) : 'November 2025';
 
   return (
     <DashboardLayout>
@@ -45,21 +45,25 @@ const Profil = () => {
         <div className="bg-gradient-hero rounded-3xl p-8 text-white">
           <div className="flex items-center gap-6">
             <div className="w-24 h-24 rounded-full bg-white flex items-center justify-center text-primary text-4xl font-bold">
-              {user?.fullName?.charAt(0) || 'B'}
+              {profile?.full_name?.charAt(0) || 'U'}
             </div>
             <div className="flex-1">
-              <h1 className="text-3xl font-bold mb-1">{user?.fullName || 'Brayen'}</h1>
-              <p className="text-white/90 mb-3">@{user?.username || 'brayen'}</p>
+              <h1 className="text-3xl font-bold mb-1">{profile?.full_name || 'User'}</h1>
+              <p className="text-white/90 mb-3">@{profile?.username || 'user'}</p>
               <div className="flex gap-3">
                 <span className="px-4 py-1 bg-white/20 backdrop-blur-sm rounded-full text-sm font-semibold">
-                  📧 {user?.email || 'brayen@gmail.com'}
+                  📧 {profile?.email || 'email@example.com'}
                 </span>
-                <span className="px-4 py-1 bg-warning/90 rounded-full text-sm font-semibold">
-                  Premium User
-                </span>
-                <span className="px-4 py-1 bg-success/90 rounded-full text-sm font-semibold">
-                  ✓ Aktif
-                </span>
+                {profile?.is_premium && (
+                  <span className="px-4 py-1 bg-warning/90 rounded-full text-sm font-semibold">
+                    Premium User
+                  </span>
+                )}
+                {profile?.is_active && (
+                  <span className="px-4 py-1 bg-success/90 rounded-full text-sm font-semibold">
+                    ✓ Aktif
+                  </span>
+                )}
               </div>
             </div>
           </div>
@@ -124,8 +128,8 @@ const Profil = () => {
                 <div>
                   <Label>Nama Lengkap *</Label>
                   <Input
-                    value={formData.fullName}
-                    onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
+                    value={formData.full_name}
+                    onChange={(e) => setFormData({ ...formData, full_name: e.target.value })}
                     required
                   />
                 </div>
@@ -170,8 +174,8 @@ const Profil = () => {
                     <Label>Tanggal Lahir</Label>
                     <Input
                       type="date"
-                      value={formData.birthDate}
-                      onChange={(e) => setFormData({ ...formData, birthDate: e.target.value })}
+                      value={formData.birth_date}
+                      onChange={(e) => setFormData({ ...formData, birth_date: e.target.value })}
                     />
                   </div>
                 </div>

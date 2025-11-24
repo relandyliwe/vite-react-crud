@@ -3,11 +3,12 @@ import { useNavigate, Link } from 'react-router-dom';
 import { Brain, Mail, Lock, User } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { usersApi } from '@/lib/api';
+import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
 
 const Register = () => {
   const navigate = useNavigate();
+  const { signup } = useAuth();
   const [formData, setFormData] = useState({
     username: '',
     email: '',
@@ -21,19 +22,17 @@ const Register = () => {
     setIsLoading(true);
 
     try {
-      const newUser = {
-        ...formData,
-        phone: '',
-        gender: '',
-        birthDate: '',
-        isPremium: false,
-        isActive: true,
-        joinedDate: new Date().toISOString().split('T')[0],
-      };
+      const success = await signup(formData.email, formData.password, {
+        username: formData.username,
+        full_name: formData.fullName,
+      });
 
-      await usersApi.create(newUser);
-      toast.success('Registrasi berhasil! Silakan login.');
-      navigate('/');
+      if (success) {
+        toast.success('Registrasi berhasil! Silakan login.');
+        navigate('/');
+      } else {
+        toast.error('Terjadi kesalahan saat registrasi');
+      }
     } catch (error) {
       toast.error('Terjadi kesalahan saat registrasi');
     } finally {
@@ -76,7 +75,7 @@ const Register = () => {
             <div>
               <label className="block text-sm font-medium mb-2">Username</label>
               <div className="relative">
-                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+                <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
                 <Input
                   type="text"
                   value={formData.username}
