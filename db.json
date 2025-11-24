@@ -1,0 +1,75 @@
+{
+  "users": [
+    {
+      "id": 1,
+      "username": "brayen",
+      "email": "brayen@gmail.com",
+      "password": "password123",
+      "fullName": "Brayen",
+      "phone": "23124144123213",
+      "gender": "Laki-laki",
+      "birthDate": "1995-05-15",
+      "isPremium": true,
+      "isActive": true,
+      "joinedDate": "2025-11-01"
+    }
+  ],
+  "schedules": [
+    {
+      "id": 1,
+      "userId": 1,
+      "title": "Belajar Menggambar",
+      "description": "",
+      "date": "2025-11-24",
+      "startTime": "08:00",
+      "endTime": "09:00",
+      "location": "Unklab",
+      "priority": "low",
+      "status": "ongoing",
+      "createdAt": "2025-11-20T10:00:00Z"
+    },
+    {
+      "id": 2,
+      "userId": 1,
+      "title": "belar coding",
+      "description": "",
+      "date": "2025-11-23",
+      "startTime": "08:00",
+      "endTime": "09:00",
+      "location": "Unklab",
+      "priority": "medium",
+      "status": "completed",
+      "createdAt": "2025-11-20T11:00:00Z"
+    },
+    {
+      "id": 3,
+      "userId": 1,
+      "title": "Belajar gaming",
+      "description": "",
+      "date": "2025-11-23",
+      "startTime": "08:00",
+      "endTime": "09:00",
+      "location": "Unklab",
+      "priority": "high",
+      "status": "ongoing",
+      "createdAt": "2025-11-20T12:00:00Z"
+    }
+  ],
+  "reminders": [
+    {
+      "id": 1,
+      "userId": 1,
+      "scheduleId": 1,
+      "type": "whatsapp",
+      "isActive": true
+    },
+    {
+      "id": 2,
+      "userId": 1,
+      "scheduleId": 3,
+      "type": "whatsapp",
+      "isActive": true
+    }
+  ],
+  "chats": []
+}
